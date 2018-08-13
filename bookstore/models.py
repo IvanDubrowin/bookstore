@@ -2,7 +2,6 @@ from bookstore import db, views, login_manager
 from sqlalchemy.orm import relationship, backref
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from whoosh.analysis import StemmingAnalyzer
 import flask.ext.whooshalchemy as whooshalchemy
 from bookstore import app
 
