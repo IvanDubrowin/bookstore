@@ -1,0 +1,10 @@
+
+__pycache__/
+
+*.pyc
+
+whoosh_index/
+
+db_repository/
+
+app\.db

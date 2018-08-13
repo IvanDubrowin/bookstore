@@ -1,0 +1,51 @@
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block content %}
+<div class="card">
+      <h5 class="card-header row justify-content-center">
+        <div class="btn-group">
+          <a href="{{ url_for('lk_create') }}" type="button" class="btn btn-primary">Добавить данные</a>
+          <a href="{{ url_for('lk_delete') }}" type="button" class="btn btn-primary">Удалить данные</a>
+          <a href="{{ url_for('lk_update') }}" type="button" class="btn btn-primary">Обновить данные</a>
+          <a href="{{ url_for('lk_orders') }}" type="button" class="btn btn-primary">Заказы</a>
+        </div>
+      </h5>
+      <div class="card-body" align="center">
+        <h5 class="card-title">Тут можно обновить данные</h5>
+        <p class="card-text">
+            <div class="card">
+              <div class="card-header">
+                <h1>Обновить данные в книге:</h1>
+              </div>
+              <div class="form-row justify-content-center">
+                <div class="col-md-6 mb-3">{{wtf.quick_form(bookform)}}</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h1>Обновить имя автора:</h1>
+              </div>
+              <div class="form-row justify-content-center">
+                <div class="col-md-3 mb-3">{{wtf.quick_form(authorform)}}</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h1>Добавить автора в книгу:</h1>
+              </div>
+              <div class="form-row justify-content-center">
+                <div class="col-md-3 mb-3">{{wtf.quick_form(addform)}}</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h1>Обновить обложку:</h1>
+              </div>
+              <div class="form-row justify-content-center">
+                <div class="col-md-3 mb-3">{{wtf.quick_form(imageform)}}</div>
+              </div>
+            </div>
+        </p>
+      </div>
+    </div>
+{% endblock %}

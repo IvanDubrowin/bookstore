@@ -1,0 +1,15 @@
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block content %}
+<div class="row justify-content-md-center">
+  <div><h1>Найдено по запросу {{ query }}:</h1></div>
+</div>
+{% for author in authors %}
+  <h1>{{ author.name }}</h1>
+  <h1>{{ author.books }}</h1>
+{% endfor %}
+{% for book in books %}
+  <h1>{{ book.book }}</h1>
+  <h1>{{ book.authors }}</h1>
+{% endfor %}
+{% endblock %}

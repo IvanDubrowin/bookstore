@@ -1,0 +1,26 @@
+{% extends "template.html" %}
+{% block content %}
+<div class="card">
+  <h5 class="card-header text-center bg-dark text-white">{{ item.book }}</h5>
+    <div class="container">
+      <div class="row my-10">
+        <div class="row col-lg-12 my-4">
+          <div class="col-lg-3">
+            <img class="embed-responsive" src="{{ url_for('book_image', id=item.id) }}">
+          </div>
+          <div class="col-lg-8">
+            <div class="text-justify">
+              <p>{{ item.description }}</p>
+              <p> Жанр: {{ item.type }}</p>
+              <p> Авторы: {{ item.authors }}</p>
+              <p> Цена: {{ item.price }} р.</p>
+              <div class="text-center">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('buy_book', id=item.id) }}" class="btn btn-primary">Сделать заказ</a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}

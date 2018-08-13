@@ -1,0 +1,14 @@
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block content %}
+<div class="row justify-content-md-center">
+  <div class="col-md-6 jumbotron w-75 p-5 text-center">
+    <h1>Введите логин и пароль</h1>
+      <p>
+        <a>
+          {{wtf.quick_form(form)}}
+        </a>
+      </p>
+  </div>
+</div>
+{% endblock %}

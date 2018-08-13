@@ -1,0 +1,37 @@
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block content %}
+<div class="card">
+  <h1 class="card-header row justify-content-md-center">
+    <a>Корзина:</a>
+  </h1>
+  <div class="card">
+    <h5 class="card-header row justify-content-center">
+      <div class="btn-group">
+        <a href="{{ url_for('cart') }}" type="button" class="btn btn-primary">Корзина</a>
+        <a href="{{ url_for('orders_in_work') }}" type="button" class="btn btn-primary">Оформленные заказы</a>
+      </div>
+    </h5>
+  {% for order in orders %}
+  <div class="card-body">
+      <p class="card-text">
+        <div class="text">
+          <h1>Заказ номер: {{ order.id }} {{ order.status }}</h1>
+          <h3> книга: {{ order.book }}</h3>
+          <h3> цена: {{ order.price }}р.</h3>
+          <h3> имя покупателя: {{ order.user }}</h3>
+          <h3> email: {{ order.email }}</h3>
+          <h3> телефон: {{ order.number }}</h3>
+          <h3> <a href="{{ url_for('delete_order', id=order.id) }}" type="button" class="btn btn-primary">Удалить заказ</a></h3>
+        </div>
+      </p>
+  </div>
+  </div>
+  {% endfor %}
+  <div class="card">
+    <div class="card-footer text-muted row justify-content-md-center">
+      <a href="{{ url_for('work') }}" type="button" class="btn btn-primary">Заказать</a>
+    </div>
+  </div>
+  </div>
+{% endblock %}

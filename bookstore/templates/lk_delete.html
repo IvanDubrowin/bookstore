@@ -1,0 +1,35 @@
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block content %}
+    <div class="card">
+      <h5 class="card-header row justify-content-center">
+        <div class="btn-group">
+          <a href="{{ url_for('lk_create') }}" type="button" class="btn btn-primary">Добавить данные</a>
+          <a href="{{ url_for('lk_delete') }}" type="button" class="btn btn-primary">Удалить данные</a>
+          <a href="{{ url_for('lk_update') }}" type="button" class="btn btn-primary">Обновить данные</a>
+          <a href="{{ url_for('lk_orders') }}" type="button" class="btn btn-primary">Заказы</a>
+        </div>
+      </h5>
+      <div class="card-body" align="center">
+        <h5 class="card-title">Тут можно удалить книгу или автора</h5>
+        <p class="card-text">
+            <div class="card">
+              <div class="card-header">
+                <h1>Удалить книгу:</h1>
+              </div>
+              <div class="form-row justify-content-center">
+                <div class="col-md-6 mb-3">{{wtf.quick_form(bookform)}}</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h1>Удалить автора:</h1>
+              </div>
+              <div class="form-row justify-content-center">
+                <div class="col-md-3 mb-3">{{wtf.quick_form(authorform)}}</div>
+              </div>
+            </div>
+        </p>
+      </div>
+    </div>
+{% endblock %}

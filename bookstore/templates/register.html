@@ -1,0 +1,23 @@
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block content %}
+<div class="row justify-content-md-center">
+  <div class="col-md-6 jumbotron w-75 p-5 text-center">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class=flashes>
+        {% for category, message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <h1>Введите логин и пароль</h1>
+      <p>
+        <a>
+          {{wtf.quick_form(form)}}
+        </a>
+      </p>
+  </div>
+</div>
+{% endblock %}

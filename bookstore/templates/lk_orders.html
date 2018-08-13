@@ -1,0 +1,49 @@
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block content %}
+<div class="card">
+  <h5 class="card-header row justify-content-center">
+    <div class="btn-group">
+      <a href="{{ url_for('lk_create') }}" type="button" class="btn btn-primary">Добавить данные</a>
+      <a href="{{ url_for('lk_delete') }}" type="button" class="btn btn-primary">Удалить данные</a>
+      <a href="{{ url_for('lk_update') }}" type="button" class="btn btn-primary">Обновить данные</a>
+      <a href="{{ url_for('lk_orders') }}" type="button" class="btn btn-primary">Заказы</a>
+    </div>
+  </h5>
+  <div class="card-body">
+      <p class="card-text">
+        <div class="row justify-content-md-center">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class=flashes>
+              {% for category, message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </p>
+    {% for order in orders %}
+    <div class="card">
+    <div class="card-body">
+        <p class="card-text">
+          <div class="text">
+            <h1>Заказ номер: {{ order.id }} {{ order.status }}</h1>
+            <h3> книга: {{ order.book }}</h3>
+            <h3> цена: {{ order.price }}р.</h3>
+            <h3> имя покупателя: {{ order.user }}</h3>
+            <h3> email: {{ order.email }}</h3>
+            <h3> телефон: {{ order.number }}</h3>
+            <h3> <a href="{{ url_for('delete_order', id=order.id) }}" type="button" class="btn btn-primary">Удалить заказ</a></h3>
+            {% if order.status == 'заказ в обработке' %}
+            <h3> <a href="{{ url_for('lk_work', id=order.id) }}" type="button" class="btn btn-primary">В работу</a></h3>
+            {% endif %}
+          </div>
+        </p>
+    </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

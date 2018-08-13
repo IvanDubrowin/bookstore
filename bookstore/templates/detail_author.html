@@ -1,0 +1,11 @@
+{% extends "template.html" %}
+{% block content %}
+<div class="card">
+  <h5 class="card-header text-center bg-dark text-white">О Авторе</h5>
+<div class="container text-center">
+  <div class="text-justify-center">
+    <h1>{{ item.name }}</h1>
+    <h3> Книги автора: {{ item.books }}</h3>
+  </div>
+</div>
+{% endblock %}

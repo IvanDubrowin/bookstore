@@ -1,0 +1,24 @@
+{% extends "template.html" %}
+{% block content %}
+<div class="row justify-content-md-center">
+  <h1>Список книг:</h1>
+</div>
+<div class="row">
+{% for item in items %}
+<div class="col-sm-3">
+  <div class="bs-component">
+    <div class="card text-white bg-dark text-center" style="width: 15rem;">
+      <div class="card-header">
+        <img class="card-img-top w-50 p-6" src="{{ url_for('book_image', id=item.id) }}">
+      </div>
+        <div class="card-body">
+          <h5 class="card-title">{{ item.book }}</h5>
+          <p class="card-text">{{ item.price }} р.</p>
+          <a href="books/{{item.id}}" class="btn btn-primary">Купить</a>
+        </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

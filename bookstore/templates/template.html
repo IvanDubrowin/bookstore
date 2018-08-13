@@ -1,0 +1,76 @@
+{% import "bootstrap/wtf.html" as wtf %}
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport"    content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="">
+
+	<title>BOOKS</title>
+
+
+	<link rel="stylesheet" type="text/css" media="screen" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+	<style> 
+    body {
+        background:url({{ url_for('static', filename='images/86.png') }});
+    }
+  </style>
+</head>
+<body>
+	<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+		<a class="logo"><img src="/static/images/book.png"></a>
+		<a class="navbar-brand text-light navbar center">МАГАЗИН КНИГ</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarCollapse">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active">
+					<a class="nav-link" href="/">Домой<span class="sr-only">(current)</span></a>
+				</li>
+				<li class="nav-item active">
+					<a class="nav-link" href="/books">Книги</a>
+				</li>
+				<li class="nav-item active">
+					<a class="nav-link disabled" href="/authors">Авторы</a>
+				</li>
+			</ul>
+			<form method="GET" class="form-inline mt-3 mt-md-2" action="{{ url_for('search') }}" enctype="text/plain">
+				<input class="form-control mr-sm-5" type="text" placeholder="Введите текст" name="q" value="{{ request.args.get('q', '') }}">
+				<button class="btn btn-secondary my-0 my-sm-0" type="submit" style="  margin-right: 10px;">Искать</button>
+			</form>
+			{% if current_user.is_authenticated %}
+			<form class="form-inline mt-3 mt-md-2" action="{{ url_for('logout') }}">
+				<button class="btn btn-secondary my-0 my-sm-0" type="submit" style="  margin-right: 10px;">Выйти</button>
+			</form>
+			{% if current_user.is_administrator() %}
+			<form class="form-inline mt-3 mt-md-2" action="{{ url_for('lk') }}">
+				<button class="btn btn-secondary my-0 my-sm-0" type="submit" style="  margin-right: 10px;">Кабинет</button>
+			</form>
+			{% else %}
+			<form class="form-inline mt-3 mt-md-2" action="{{ url_for('cart') }}">
+				<button class="btn btn-secondary my-0 my-sm-0" type="submit" style="  margin-right: 10px;">Заказы</button>
+			</form>
+			{% endif %}
+			{% else %}
+			<form class="form-inline mt-3 mt-md-2" action="{{ url_for('login') }}">
+				<button class="btn btn-secondary my-0 my-sm-0" type="submit" style="  margin-right: 10px;">Войти</button>
+			</form>
+			<form class="form-inline mt-3 mt-md-2" action="{{ url_for('register') }}">
+				<button class="btn btn-secondary my-0 my-sm-0" type="submit" style="  margin-right: 10px;">Регистрация</button>
+			</form>
+			{% endif %}
+
+		</div>
+	</nav>
+	<main>
+		<div class="container container-centered" style="padding-top: 30">
+				{% block content %}
+				{% endblock %}
+		</div>
+	</main>
+	<footer id="footer" class="top-space"></footer>
+</body>
+</html>

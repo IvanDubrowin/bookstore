@@ -1,0 +1,28 @@
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block content %}
+<div class="card">
+  <h5 class="card-header row justify-content-center">
+    <div class="btn-group">
+      <a href="{{ url_for('lk_create') }}" type="button" class="btn btn-primary">Добавить данные</a>
+      <a href="{{ url_for('lk_delete') }}" type="button" class="btn btn-primary">Удалить данные</a>
+      <a href="{{ url_for('lk_update') }}" type="button" class="btn btn-primary">Обновить данные</a>
+      <a href="{{ url_for('lk_orders') }}" type="button" class="btn btn-primary">Заказы</a>
+    </div>
+  </h5>
+  <div class="card-body">
+      <p class="card-text"><div class="row justify-content-md-center">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class=flashes>
+              {% for category, message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </p>
+  </div>
+</div>
+{% endblock %}
