@@ -1,12 +1,10 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from bookstore import app, db, bootstrap, login_manager
 from wtforms import ValidationError
-from .models import Book, Author, User, Role, Association, Order
+from .models import Book, Author, User, Role, Association, Order, admin_permission
 from .forms import LoginForm, RegistrationForm, CreateBookForm, CreateAuthorForm, DeleteBookForm, DeleteAuthorForm, UpdateBookForm, UpdateAuthorForm, AddAuthorForm, UploadUpdate
 from flask_login import login_required, login_user, logout_user, current_user
 from .decorators import admin_required
-
-
 
 
 @app.route('/')
@@ -28,13 +26,13 @@ def authors():
 
 @app.route('/books/<book>')
 def detail_book(book):
-    book = Book.query.filter_by(id = book).first_or_404()
+    book = Book.query.get_or_404(book)
     return render_template("detail_book.html", item = book)
 
 
 @app.route('/authors/<name>')
 def detail_author(name):
-    name = Author.query.filter_by(id = name).first_or_404()
+    name = Author.query.get_or_404(name)
     return render_template("detail_author.html", item = name)
 
 
@@ -68,12 +66,10 @@ def logout():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data,
+        user = User.create(email=form.email.data,
                     username=form.username.data,
                     password=form.password.data,
                     number=form.number.data)
-        db.session.add(user)
-        db.session.commit()
         flash('Теперь вы можете войти в систему')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
@@ -92,26 +88,22 @@ def lk():
 def lk_create():
     authorform = CreateAuthorForm()
     if authorform.submit_author.data and authorform.validate():
-        author = Author(name=authorform.author.data)
-        db.session.add(author)
-        db.session.commit()
+        author = Author.create(name=authorform.author.data)
         flash('Вы создали автора')
         return redirect(url_for('lk'))
+
     bookform = CreateBookForm()
     if bookform.submit_book.data and bookform.validate():
         file = request.files['image']
         new_file = file.read()
-        book = Book(book=bookform.name.data,
+        book = Book.create(book=bookform.name.data,
                     type=bookform.type.data,
                     description=bookform.description.data,
                     price=bookform.price.data,
                     authors=[bookform.authors.data],
                     image=new_file)
-        db.session.add(book)
-        db.session.commit()
         flash('Вы создали книгу')
         return redirect(url_for('lk'))
-
     return render_template('lk_create.html', bookform=bookform, authorform=authorform)
 
 
@@ -121,36 +113,36 @@ def lk_create():
 def lk_update():
     authorform = UpdateAuthorForm()
     if authorform.submit_author.data and authorform.validate():
-        db.session.query(Author).filter_by(id=request.form['name']).\
-        update({Author.name: authorform.author.data})
-        db.session.commit()
+        author = Author.query.get_or_404(request.form['name'])
+        author.update(name=authorform.author.data)
         flash('Вы изменили имя автора')
         return redirect(url_for('lk'))
+
     bookform = UpdateBookForm()
     if bookform.submit_book.data and bookform.validate():
-        db.session.query(Book).filter_by(id=request.form['choose_book']).\
-        update({Book.book: bookform.name.data,
-                Book.type: bookform.type.data,
-                Book.description: bookform.description.data,
-                Book.price: bookform.price.data})
-        db.session.commit()
+        book = Book.query.get_or_404(request.form['choose_book'])
+        book.update(book=bookform.name.data,
+                    type=bookform.type.data,
+                    description=bookform.description.data,
+                    price=bookform.price.data)
         flash('Вы изменили данные в книге')
         return redirect(url_for('lk'))
+
     addform = AddAuthorForm(request.form)
     if addform.submit_add.data and addform.validate():
-        add = Association(books=request.form['book'],
-                          authors=request.form['author'])
-        db.session.add(add)
-        db.session.commit()
+        add = Association.create(
+                            books=request.form['book'],
+                            authors=request.form['author']
+                            )
         flash('Вы добавили автора')
         return redirect(url_for('lk'))
+
     imageform = UploadUpdate()
     if imageform.submit_image.data and imageform.validate():
         get_file = request.files['new_image']
         file = get_file.read()
-        db.session.query(Book).filter_by(id=request.form['book_name']).\
-        update({Book.image: file})
-        db.session.commit()
+        book = Book.query.get_or_404(request.form['book_name'])
+        book.update(image=file)
         flash('Вы обновили обложку')
         return redirect(url_for('lk'))
     return render_template('lk_update.html', authorform=authorform, bookform=bookform, addform=addform, imageform=imageform)
@@ -162,16 +154,16 @@ def lk_update():
 def lk_delete():
     authorform = DeleteAuthorForm(request.form)
     bookform = DeleteBookForm(request.form)
+
     if authorform.submit_author.data and authorform.validate():
-        author = Author.query.filter_by(id=(request.form['name'])).first()
-        db.session.delete(author)
-        db.session.commit()
+        author = Author.query.get_or_404(request.form['name'])
+        author.delete()
         flash('Вы удалили автора')
         return redirect(url_for('lk'))
+
     if bookform.submit_book.data and bookform.validate():
-        book = Book.query.filter_by(id=(request.form['name'])).first()
-        db.session.delete(book)
-        db.session.commit()
+        book = Book.query.get_or_404(request.form['name'])
+        book.delete()
         flash('Вы удалили книгу')
         return redirect(url_for('lk'))
     return render_template('lk_delete.html', authorform=authorform, bookform=bookform)
@@ -202,26 +194,23 @@ def orders_in_work():
 @app.route('/books/buy/<id>', methods=['POST', 'GET'])
 @login_required
 def buy_book(id):
-    book = Book.query.filter_by(id=id).first_or_404()
-    order = Order(
+    book = Book.query.get_or_404(id)
+    order = Order.create(
                 user = current_user.username,
                 book = book.book,
                 email = current_user.email,
                 price = book.price,
                 number = current_user.number,
                 status = 'создан')
-    db.session.add(order)
-    db.session.commit()
     return redirect(url_for('cart'))
 
 
 @app.route('/delete/<id>', methods=['POST', 'GET'])
 @login_required
 def delete_order(id):
-    order = Order.query.filter_by(id=id).first_or_404()
-    db.session.delete(order)
-    db.session.commit()
-    if current_user.role_id == 1:
+    order = Order.query.get_or_404(id)
+    order.delete()
+    if current_user.role_id == admin_permission:
         return redirect(url_for('lk_orders'))
     else:
         return redirect(url_for('cart'))
@@ -230,9 +219,9 @@ def delete_order(id):
 @app.route('/work', methods=['POST', 'GET'])
 @login_required
 def work():
-    db.session.query(Order).filter_by(user=current_user.username).\
-    update({Order.status: 'заказ в обработке'})
-    db.session.commit()
+    orders = Order.query.filter_by(user=current_user.username).all()
+    for order in orders:
+        order.update(status='заказ в обработке')
     return redirect(url_for('cart'))
 
 
@@ -248,9 +237,8 @@ def lk_orders():
 @login_required
 @admin_required
 def lk_work(id):
-    db.session.query(Order).filter_by(id=id).\
-    update({Order.status: 'В работе'})
-    db.session.commit()
+    order = Order.query.get(id)
+    order.update(status='В работе')
     return redirect(url_for('lk_orders'))
 
 

@@ -9,6 +9,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleF
 from .models import User, Book, Author, Association
 from bookstore import db
 
+
 class LoginForm(FlaskForm):
     name = StringField('Введите ваше имя', validators=[Required()])
     email = TextField('Введите почту', validators=[Required(), Email(), Length(1, 64)])
@@ -48,7 +49,6 @@ class CreateBookForm(FlaskForm):
     authors = QuerySelectField('Автор', query_factory=lambda: Author.query.all(), get_label='name')
     image = FileField('Обложка', validators=[Required()])
     submit_book = SubmitField('Добавить')
-
 
 
 class CreateAuthorForm(FlaskForm):

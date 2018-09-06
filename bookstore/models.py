@@ -6,18 +6,45 @@ from whoosh.analysis import StemmingAnalyzer
 import flask.ext.whooshalchemy as whooshalchemy
 from bookstore import app
 
+admin_email = 'admin@admin.ru'
+
+admin_permission = 1
+
+user_permission = 2
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+class CRUDMixin():
 
-class Association(db.Model):
+    @classmethod
+    def create(cls, **kwargs):
+        instance = cls(**kwargs)
+        return instance.save()
+
+    def update(self, commit=True, **kwargs):
+        for attr, value in kwargs.items():
+            setattr(self, attr, value)
+        return commit and self.save() or self
+
+    def save(self, commit=True):
+        db.session.add(self)
+        if commit:
+            db.session.commit()
+        return self
+
+    def delete(self, commit=True):
+        db.session.delete(self)
+        return commit and db.session.commit()
+
+
+class Association(db.Model, CRUDMixin):
     books = db.Column(db.String(30), db.ForeignKey('book.id', ondelete='cascade'),
     primary_key=True)
     authors = db.Column(db.String(30), db.ForeignKey('author.id', ondelete='cascade'), primary_key=True)
 
-class Book(db.Model):
+class Book(db.Model, CRUDMixin):
     __searchable__ = ['book']
 
     id = db.Column(db.Integer, primary_key=True)
@@ -33,7 +60,7 @@ class Book(db.Model):
 
 whooshalchemy.whoosh_index(app, Book)
 
-class Author(db.Model):
+class Author(db.Model, CRUDMixin):
     __searchable__ = ['name']
 
     id = db.Column(db.Integer, primary_key=True)
@@ -45,7 +72,7 @@ class Author(db.Model):
 
 whooshalchemy.whoosh_index(app, Author)
 
-class User(db.Model, UserMixin):
+class User(db.Model, UserMixin, CRUDMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30), unique = False, index = True)
     email = db.Column(db.String(100), unique = True)
@@ -59,21 +86,17 @@ class User(db.Model, UserMixin):
         self.password = password
         self.number = number
 
-        if self.email == 'admin@admin.ru':
-            self.role_id = 1
+        if self.email == admin_email:
+            self.role_id = admin_permission
         else:
-            self.role_id = 2
+            self.role_id = user_permission
 
     def __repr__(self):
         return '<User %r>' % self.username
 
-
-
     def is_administrator(self):
-        if self.role_id == 1:
+        if self.role_id == admin_permission:
             return True
-
-
 
     @property
     def password(self):
@@ -87,7 +110,7 @@ class User(db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
 
 
-class Role(db.Model):
+class Role(db.Model, CRUDMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), unique = True)
     users = db.relationship('User', backref='role', lazy='dynamic')
@@ -96,8 +119,7 @@ class Role(db.Model):
         return '<Role %r>' % self.name
 
 
-
-class Order(db.Model):
+class Order(db.Model, CRUDMixin):
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.String(30))
     book = db.Column(db.String(128))
